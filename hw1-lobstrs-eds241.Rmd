@@ -45,6 +45,7 @@ library(jtools)
 library(gt)
 library(gtsummary)
 library(interactions) 
+library(ggridges)
 
 ```
 
@@ -124,7 +125,7 @@ Create new `df` named `spiny_counts`
 #HINT(d): Use `group_by()` & `summarize()` to provide the total number of lobsters observed at each site-year-transect row-observation. 
 spiny_counts <- tidydata |> 
     group_by(site, year, transect) |> 
-    summarise(counts = n(), mean_size = mean(size_mm, na.rm = TRUE))
+    summarise(counts = sum(count, na.rm = TRUE), mean_size_mm = mean(size_mm, na.rm = TRUE))
 
 #HINT(e): Use `case_when()` to create the 3 new variable columns
 spiny_counts <- spiny_counts |> 
@@ -166,17 +167,59 @@ Create a plot of lobster **size** :
 4)  You choose the grouping variable(s)!
 
 ```{r}
-# plot 1: ....
+# plot 1: Total lobster counts by site
+# spiny_counts |> 
+#     group_by(site, mpa) |> 
+#     summarise(total_site_count = sum(counts, na.rm = TRUE)) |> 
+# ggplot(aes(site, total_site_count, fill = mpa)) +
+# geom_bar(stat = "identity") +
+# scale_fill_manual(values = c("MPA" = "darkgreen")) +
+# theme_classic()
 
-spiny_counts %>% 
-ggplot()
-    
+ggplot(spiny_counts, aes(x = counts, y = site, fill = mpa)) +
+    geom_density_ridges2() +
+    scale_fill_manual(values = c("MPA" = "darkgreen", "non_MPA" = "grey59")) +
+    theme_classic()
+```
+
+```{r}
+# plot 2: Total lobster counts by mpa
+# spiny_counts |> 
+#     group_by(mpa) |> 
+#     summarise(total_mpa_count = sum(counts, na.rm = TRUE)) |> 
+# ggplot(aes(mpa, total_mpa_count)) +
+# geom_bar(stat = "identity") +
+# scale_fill_manual(values = c("MPA" = "darkgreen")) +
+# theme_classic()
+
+ggplot(spiny_counts, aes(x = mpa, y = counts)) +
+    geom_violin() +
+    scale_fill_manual(values = c("MPA" = "darkgreen", "non_MPA" = "grey59")) +
+    theme_classic()
+```
+
+```{r}
+# plot 3: Total lobster counts by year
+ggplot(spiny_counts, aes(x = counts)) +
+    geom_histogram() +
+    facet_wrap(~year) +
+    theme_classic()
+```
+
+```{r}
+# plot 4: Total lobster size by mpa
+ggplot(spiny_counts, aes(x = mean_size_mm, color = mpa)) +
+    geom_density() +
+    scale_color_manual(values = c("MPA" = "darkgreen", "non_MPA" = "grey59")) +
+    theme_classic()
 ```
 
 **c.** Compare means of the outcome by treatment group. Using the `tbl_summary()` function from the package [`gt_summary`](https://www.danieldsjoberg.com/gtsummary/articles/tbl_summary.html)
 
 ```{r}
 # USE: gt_summary::tbl_summary()
+spiny_counts |> 
+    tbl_summary(by = mpa, include = c(counts))
 ```
 
 ------------------------------------------------------------------------
