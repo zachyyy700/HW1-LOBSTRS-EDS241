@@ -1,0 +1,76 @@
+---
+title: "HW1 Extra Credit"
+---
+
+```{r}
+# Load packages
+library(tidyverse)
+library(performance)
+library(jtools)
+library(gt)
+library(gtsummary)
+library(interactions)
+library(MASS)
+```
+
+```{r}
+# Load data
+raw  <- read_csv(here::here("data", "extracredit_sblobstrs24.csv"), na = c("-99999", NA)) |> 
+  janitor::clean_names()
+```
+
+```{r}
+# Wrangle counts
+lob_counts <- raw |> 
+    group_by(site, year, transect) |> 
+    summarise(counts = sum(count, na.rm = TRUE), mean_size_mm = mean(size_mm, na.rm = TRUE)) |> 
+    mutate(mpa = case_when(
+      site %in% c("IVEE", "NAPL") ~ "MPA",
+      site %in% c("MOHK", "CARP", "AQUE") ~ "non_MPA"),
+      treat = case_when(
+          mpa == "MPA" ~ 1,
+          mpa == "non_MPA" ~ 0),
+        year = as_factor(year))
+```
+
+```{r}
+# Run first model & summary
+model1_pois <- glm(counts ~ treat, data = lob_counts, family = poisson(link = "log"))
+summ(model1_pois)
+```
+
+```{r}
+# Check diagnostics
+check_overdispersion(model1_pois)
+check_zeroinflation(model1_pois)
+
+check_predictions(model1_pois)
+```
+
+```{r}
+# Run second model & summary
+model2_nb <- glm.nb(counts ~ treat, data = lob_counts)
+summ(model2_nb)
+```
+
+```{r}
+# Check diagnostics
+check_overdispersion(model2_nb)
+check_zeroinflation(model2_nb)
+
+check_predictions(model2_nb)
+```
+
+```{r}
+# Run third model & summary
+model3_nbint <- glm.nb(counts ~ treat * year, data = lob_counts)
+summ(model3_nbint)
+```
+
+```{r}
+# Check diagnostics
+check_overdispersion(model3_nbint)
+check_zeroinflation(model3_nbint)
+
+check_predictions(model3_nbint)
+```
