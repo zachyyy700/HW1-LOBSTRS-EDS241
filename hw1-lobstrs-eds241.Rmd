@@ -169,34 +169,58 @@ Create a plot of lobster **size** :
 4)  You choose the grouping variable(s)!
 
 ```{r}
-
+# Plot1: Lobster counts by site
 ggplot(spiny_counts, aes(x = counts, y = site, fill = mpa)) +
-    geom_density_ridges2() +
+    geom_violin(quantile.linetype = "solid") +
     scale_fill_manual(values = c("MPA" = "darkgreen", "non_MPA" = "grey59")) +
+    labs(x = "Lobster Count", y = "Site", fill = "MPA Status") +
     theme_classic()
 ```
 
 ```{r}
+# Plot2: Lobster counts by mpa, means
+spiny_counts <- spiny_counts |> 
+    mutate(mpa = factor(mpa, levels = c("non_MPA", "MPA")))
+means <- spiny_counts |> 
+    group_by(mpa) |> 
+    summarise(mean = mean(counts, na.rm = TRUE))
+ggplot(spiny_counts, aes(x = counts, y = mpa, fill = mpa)) +
+    geom_density_ridges2(scale = 2) +
 
-ggplot(spiny_counts, aes(x = mpa, y = counts)) +
-    geom_violin() +
+    geom_text(data = means, aes(x = mean + 40, y = as.numeric(mpa) + 0.7), label = "Mean count") +
+
+    geom_segment(data = means, aes(x = mean, xend = mean, 
+    y = as.numeric(mpa), yend = as.numeric(mpa) + 1, color = mpa), 
+    linewidth = 1, linetype = "dashed") +
+
     scale_fill_manual(values = c("MPA" = "darkgreen", "non_MPA" = "grey59")) +
-    theme_classic()
+    scale_color_manual(values = c("MPA" = "darkgreen", "non_MPA" = "grey59")) +
+
+    labs(x = "Lobster Count", y = "MPA Status") +
+
+    theme_classic() +
+    theme(legend.position = "none")
 ```
 
 ```{r}
-# plot 3: Total lobster counts by year
-ggplot(spiny_counts, aes(x = counts)) +
-    geom_histogram() +
-    facet_wrap(~year) +
+# Plot3: Lobster count density by year, range
+ggplot(spiny_counts, aes(x = counts, group = factor(year), color = factor(year))) +
+    geom_density() +
+
+    labs(x = "Lobster Counts", y = "Density", color = "Year") +
+
     theme_classic()
 ```
 
 ```{r}
 # plot 4: Average lobster size by mpa
-ggplot(spiny_counts, aes(x = mean_size_mm, color = mpa)) +
-    geom_density() +
-    scale_color_manual(values = c("MPA" = "darkgreen", "non_MPA" = "grey59")) +
+# Convert to histogram, range
+ggplot(spiny_counts, aes(x = mean_size_mm, fill = mpa)) +
+    geom_histogram(alpha = 0.4, position = "identity") +
+    scale_fill_manual(values = c("MPA" = "darkgreen", "non_MPA" = "grey59")) +
+
+    labs(x = "Mean Lobster Size (mm)", y = "Count", fill = "MPA Status") +
+
     theme_classic()
 ```
 
