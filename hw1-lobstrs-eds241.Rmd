@@ -9,7 +9,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(eval=FALSE, warning = FALSE, message = FALSE )
+knitr::opts_chunk$set(eval=TRUE, warning = FALSE, message = FALSE )
 ```
 
 ------------------------------------------------------------------------
@@ -75,7 +75,7 @@ Let’s break it down step by step and see what the data reveals! 📊
 
 **a.** Do the control sites (Arroyo Quemado, Carpenteria, and Mohawk) provide a strong counterfactual for our treatment sites (Naples, Isla Vista)? Write a paragraph making a case for why this comparison is ceteris paribus or whether selection bias is likely (be specific!).
 
-To analyze the causal effect of MPAs on lobster abundance, we need these study sites to be "equal" in every way besides MPA status. This could be done if policymakers flipped a coin to assign protection status at each of these sites, essentially assigning at random.
+To analyze the causal effect of MPAs on lobster abundance, we need these study sites to be "equal" in every way besides MPA status. This could be done if policymakers flipped a coin to assign protection status at each of these sites, essentially assigning at random. This randomness would ideally make the sites statistically identical on average and we could observe the differences after MPA treatment. To my knowledge, I'm not sure how these sites were assigned to be treated or not but usually in policymaking, assigning treatment as random isn't likely. Instead, if sites that were already degraded were assigned as the treatment, this would be assignment based on an unobservable factor, making selection bias a worry.
 
 ------------------------------------------------------------------------
 
@@ -178,23 +178,20 @@ ggplot(spiny_counts, aes(x = counts, y = site, fill = mpa)) +
 ```
 
 ```{r}
-# Plot2: Lobster counts by mpa, means
+# Plot2: Lobster counts by mpa
 spiny_counts <- spiny_counts |> 
     mutate(mpa = factor(mpa, levels = c("non_MPA", "MPA")))
 means <- spiny_counts |> 
     group_by(mpa) |> 
     summarise(mean = mean(counts, na.rm = TRUE))
-ggplot(spiny_counts, aes(x = counts, y = mpa, fill = mpa)) +
+ggplot(spiny_counts, aes(x = counts, y = mpa)) +
     geom_density_ridges2(scale = 2) +
 
-    geom_text(data = means, aes(x = mean + 40, y = as.numeric(mpa) + 0.7), label = "Mean count") +
+    geom_text(data = means, aes(x = mean + 30, y = as.numeric(mpa) + 0.7), label = "Mean count") +
 
     geom_segment(data = means, aes(x = mean, xend = mean, 
-    y = as.numeric(mpa), yend = as.numeric(mpa) + 1, color = mpa), 
+    y = as.numeric(mpa), yend = as.numeric(mpa) + 1), color = "red", 
     linewidth = 1, linetype = "dashed") +
-
-    scale_fill_manual(values = c("MPA" = "darkgreen", "non_MPA" = "grey59")) +
-    scale_color_manual(values = c("MPA" = "darkgreen", "non_MPA" = "grey59")) +
 
     labs(x = "Lobster Count", y = "MPA Status") +
 
@@ -203,7 +200,7 @@ ggplot(spiny_counts, aes(x = counts, y = mpa, fill = mpa)) +
 ```
 
 ```{r}
-# Plot3: Lobster count density by year, range
+# Plot3: Lobster count density by year
 ggplot(spiny_counts, aes(x = counts, group = factor(year), color = factor(year))) +
     geom_density() +
 
@@ -214,7 +211,6 @@ ggplot(spiny_counts, aes(x = counts, group = factor(year), color = factor(year))
 
 ```{r}
 # plot 4: Average lobster size by mpa
-# Convert to histogram, range
 ggplot(spiny_counts, aes(x = mean_size_mm, fill = mpa)) +
     geom_histogram(alpha = 0.4, position = "identity") +
     scale_fill_manual(values = c("MPA" = "darkgreen", "non_MPA" = "grey59")) +
@@ -405,7 +401,11 @@ The treatment effect is not stable across our three models. While the estimated 
 
 **c.** Take a look at the regression output. Each coefficient provides a comparison or the difference in means for a specific sub-group in the data. Informally, describe the what the model has estimated at a conceptual level (NOTE: you do not have to interpret coefficients individually)
 
+This model also uses a log link like the Poisson, so each coefficient represents multiplicative effects of lobster counts. In this model we also included another predictor, year, which the coefficients represent how counts changed over time. We also have interaction terms between treat and year. This is the additional treatment effect that changes across each year, without it we'd be assuming that the treatment effect would be constant every year.
+
 **d.** Explain why the main effect for treatment is negative? \*Does this result make sense?
+
+The treatment coefficient represents how treatment changes our counts in 2012, the negative value indicates that treatment sites had lower counts initially. Interpreting the treatment coefficient in the non-link, treatment sites had a 82% reduction in counts. However, this changes over time past 2012 and treatment counts increased indicated by the positive interaction coefficients.
 
 ```{r}
 
@@ -429,6 +429,8 @@ interact_plot(m5_fixedeffs, pred = year, modx = treat,
               outcome.scale = "link") # NOTE: y-axis on log-scale
 
 # HINT: Change `outcome.scale` to "response" to convert y-axis scale to counts
+interact_plot(m5_fixedeffs, pred = year, modx = treat,
+              outcome.scale = "response")
 ```
 
 **g.** Using `ggplot()` create a plot in same style as the previous `interaction plot`, but displaying the original scale of the outcome variable (lobster counts). This type of plot is commonly used to show how the treatment effect changes across discrete time points (i.e., panel data).

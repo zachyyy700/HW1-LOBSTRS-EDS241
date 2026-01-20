@@ -1,6 +1,9 @@
 ---
 title: "HW1 Extra Credit"
 ---
+a.  Create a new script for the analysis on the updated data
+b.  Run at least 3 regression models & assess model diagnostics
+c.  Compare and contrast results with the analysis from the 2012-2018 data sample (\~ 2 paragraphs)
 
 ```{r}
 # Load packages
@@ -35,42 +38,62 @@ lob_counts <- raw |>
 
 ```{r}
 # Run first model & summary
-model1_pois <- glm(counts ~ treat, data = lob_counts, family = poisson(link = "log"))
-summ(model1_pois)
+model1_ols <- lm(counts ~ treat, data = lob_counts)
+summ(model1_ols)
 ```
 
 ```{r}
 # Check diagnostics
-check_overdispersion(model1_pois)
-check_zeroinflation(model1_pois)
-
-check_predictions(model1_pois)
+check_model(model1_ols, check = "normality")
+check_model(model1_ols, check = "pp_check")
 ```
+
+To no surprise, running this OLS model and including this new data hasn't changed much when checking the normality and predictions. Both curves/lines don't match up with what's expected, indicating that our model doesn't fit the data well.
 
 ```{r}
 # Run second model & summary
-model2_nb <- glm.nb(counts ~ treat, data = lob_counts)
-summ(model2_nb)
+model2_pois <- glm(counts ~ treat, data = lob_counts, family = poisson(link = 'log'))
+summ(model2_pois)
 ```
 
 ```{r}
 # Check diagnostics
-check_overdispersion(model2_nb)
-check_zeroinflation(model2_nb)
-
-check_predictions(model2_nb)
+check_overdispersion(model2_pois)
+check_zeroinflation(model2_pois)
 ```
+
+Running a Poisson model on the updated data, we get similar results to the old data. As we saw in the old data, the Poisson doesn't fit well to real-world count data as too many assumptions are violated. Overdispersion and inflated zeroes are contributing to a poor, inaccurate model fit.
 
 ```{r}
 # Run third model & summary
-model3_nbint <- glm.nb(counts ~ treat * year, data = lob_counts)
-summ(model3_nbint)
+model3_nb <- glm.nb(counts ~ treat, data = lob_counts)
+summ(model3_nb)
 ```
 
 ```{r}
 # Check diagnostics
-check_overdispersion(model3_nbint)
-check_zeroinflation(model3_nbint)
-
-check_predictions(model3_nbint)
+check_overdispersion(model3_nb)
+check_zeroinflation(model3_nb)
 ```
+
+Similar to the old data, we get the same coefficients with a negative bionomial model. However, we can say we have a more appropriate fit since this model doesn't restrict variance = mean & handles zero inflation better, thus both diagnostics passed. To further explore other effects, we extend the model in the same way by adding an interaction term of year.
+
+```{r}
+# Compare summaries
+export_summs(model1_ols, model2_pois, model3_nb,
+             model.names = c("OLS","Poisson", "NB"),
+             statistics = "none")
+```
+
+```{r}
+lob_counts |> 
+  group_by(year, mpa) |> 
+  summarise(mean_count = mean(counts, na.rm = TRUE)) |> 
+  ggplot(aes(year, mean_count, group = mpa, color = mpa)) +
+  geom_point() +
+  geom_line() +
+  theme_classic()
+
+```
+
+Comparing the new data with the old data, all of the treatment coefficients increased. The OLS went from 5.36 to 7.72, and the Poisson & NB increased from 0.21 to 0.25. A big difference to point out here is in the negative binomial model. With the old data, the treatment coefficient of 0.21 was not statistically significant. Also, the NB model run on the old data is overfitting zeroes with a ratio of 1.12 (p = 0.6). With the new data, the treatment coefficient increased to 0.25 but is statistically significant (p = 0.04). This new data also is not underfitting or overfitting zeros indicating that running the same model on this new data, is a slightly better fit.
