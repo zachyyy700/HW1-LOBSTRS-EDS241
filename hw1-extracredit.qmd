@@ -1,5 +1,6 @@
 ---
 title: "HW1 Extra Credit"
+author: "Zach Loo"
 ---
 a.  Create a new script for the analysis on the updated data
 b.  Run at least 3 regression models & assess model diagnostics
@@ -96,4 +97,4 @@ lob_counts |>
 
 ```
 
-Comparing the new data with the old data, all of the treatment coefficients increased. The OLS went from 5.36 to 7.72, and the Poisson & NB increased from 0.21 to 0.25. A big difference to point out here is in the negative binomial model. With the old data, the treatment coefficient of 0.21 was not statistically significant. Also, the NB model run on the old data is overfitting zeroes with a ratio of 1.12 (p = 0.6). With the new data, the treatment coefficient increased to 0.25 but is statistically significant (p = 0.04). This new data also is not underfitting or overfitting zeros indicating that running the same model on this new data, is a slightly better fit.
+Comparing the new data with the old data, all of the treatment coefficients increased. The OLS went from 5.36 to 7.72, and the Poisson & NB increased from 0.21 to 0.25. A big difference to point out here is in the negative binomial model. With the old data, the treatment coefficient of 0.21 was not statistically significant. Also, the NB model run on the old data is overfitting zeroes with a ratio of 1.12 (p = 0.6). With the new data, the treatment coefficient increased to 0.25 but is statistically significant (p = 0.04). Converting out of log space, this coefficient translates to an increase of 28% more lobsters in MPA sites, compared to the 23% increase with the old data. This new data also is not underfitting or overfitting zeros indicating that running the same model on this new data, is a slightly better fit.
