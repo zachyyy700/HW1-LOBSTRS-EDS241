@@ -237,7 +237,8 @@ window.Quarto = {
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">treat =</span> <span class="fu">case_when</span>(</span>
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>            mpa <span class="sc">==</span> <span class="st">"MPA"</span> <span class="sc">~</span> <span class="dv">1</span>,</span>
 <span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>            mpa <span class="sc">==</span> <span class="st">"non_MPA"</span> <span class="sc">~</span> <span class="dv">0</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        ))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        )) <span class="sc">|&gt;</span> </span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">mpa =</span> <span class="fu">factor</span>(mpa, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"MPA"</span>, <span class="st">"non_MPA"</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <blockquote class="blockquote">
 <p>NOTE: This step is crucial to the analysis. Check with a friend or come to TA/instructor office hours to make sure the counts are coded correctly!</p>
@@ -268,12 +269,14 @@ window.Quarto = {
 <li>You choose the grouping variable(s)!</li>
 </ol>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot1: Lobster counts by site</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(spiny_counts, <span class="fu">aes</span>(<span class="at">x =</span> counts, <span class="at">y =</span> site, <span class="at">fill =</span> mpa)) <span class="sc">+</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_violin</span>(<span class="at">quantile.linetype =</span> <span class="st">"solid"</span>) <span class="sc">+</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"MPA"</span> <span class="ot">=</span> <span class="st">"darkgreen"</span>, <span class="st">"non_MPA"</span> <span class="ot">=</span> <span class="st">"grey59"</span>)) <span class="sc">+</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Lobster Count"</span>, <span class="at">y =</span> <span class="st">"Site"</span>, <span class="at">fill =</span> <span class="st">"MPA Status"</span>) <span class="sc">+</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_classic</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>site_order <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"NAPL"</span>, <span class="st">"IVEE"</span>, <span class="st">"MOHK"</span>, <span class="st">"CARP"</span>, <span class="st">"AQUE"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot1: Lobster counts by site</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(spiny_counts, <span class="fu">aes</span>(<span class="at">x =</span> counts, <span class="at">y =</span> <span class="fu">factor</span>(site, <span class="at">levels =</span> site_order), <span class="at">fill =</span> mpa)) <span class="sc">+</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_violin</span>(<span class="at">quantile.linetype =</span> <span class="st">"solid"</span>) <span class="sc">+</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"MPA"</span> <span class="ot">=</span> <span class="st">"darkgreen"</span>, <span class="st">"non_MPA"</span> <span class="ot">=</span> <span class="st">"grey59"</span>)) <span class="sc">+</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Lobster Count"</span>, <span class="at">y =</span> <span class="st">"Site"</span>, <span class="at">fill =</span> <span class="st">"MPA Status"</span>, <span class="at">title =</span> <span class="st">"Lobster Count Distribution per Site"</span>) <span class="sc">+</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_y_discrete</span>(<span class="at">limits =</span> rev) <span class="sc">+</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_classic</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -284,11 +287,11 @@ window.Quarto = {
 </div>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot2: Lobster counts by mpa</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>spiny_counts <span class="ot">&lt;-</span> spiny_counts <span class="sc">|&gt;</span> </span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">mpa =</span> <span class="fu">factor</span>(mpa, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"non_MPA"</span>, <span class="st">"MPA"</span>)))</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>means <span class="ot">&lt;-</span> spiny_counts <span class="sc">|&gt;</span> </span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(mpa) <span class="sc">|&gt;</span> </span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">mean =</span> <span class="fu">mean</span>(counts, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>means <span class="ot">&lt;-</span> spiny_counts <span class="sc">|&gt;</span> </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(mpa) <span class="sc">|&gt;</span> </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">mean =</span> <span class="fu">mean</span>(counts, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(spiny_counts, <span class="fu">aes</span>(<span class="at">x =</span> counts, <span class="at">y =</span> mpa)) <span class="sc">+</span></span>
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_density_ridges2</span>(<span class="at">scale =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
@@ -298,10 +301,10 @@ window.Quarto = {
 <span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fu">as.numeric</span>(mpa), <span class="at">yend =</span> <span class="fu">as.numeric</span>(mpa) <span class="sc">+</span> <span class="dv">1</span>), <span class="at">color =</span> <span class="st">"red"</span>, </span>
 <span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">linewidth =</span> <span class="dv">1</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>) <span class="sc">+</span></span>
 <span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Lobster Count"</span>, <span class="at">y =</span> <span class="st">"MPA Status"</span>) <span class="sc">+</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Lobster Count"</span>, <span class="at">y =</span> <span class="st">"MPA Status"</span>, <span class="at">title =</span> <span class="st">"Lobster Count Distribution by MPA Status"</span>) <span class="sc">+</span></span>
 <span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>, <span class="at">axis.title.y =</span> <span class="fu">element_blank</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -311,13 +314,22 @@ window.Quarto = {
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot3: Lobster count density by year</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(spiny_counts, <span class="fu">aes</span>(<span class="at">x =</span> counts, <span class="at">group =</span> <span class="fu">factor</span>(year), <span class="at">color =</span> <span class="fu">factor</span>(year))) <span class="sc">+</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_density</span>() <span class="sc">+</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Lobster Counts"</span>, <span class="at">y =</span> <span class="st">"Density"</span>, <span class="at">color =</span> <span class="st">"Year"</span>) <span class="sc">+</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_classic</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot3: Lobster count jitter by year</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>medians <span class="ot">&lt;-</span> spiny_counts <span class="sc">|&gt;</span> </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(year) <span class="sc">|&gt;</span> </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">median =</span> <span class="fu">median</span>(counts, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(spiny_counts, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">factor</span>(year), <span class="at">y =</span> counts)) <span class="sc">+</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_jitter</span>(<span class="at">width =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Year"</span>, <span class="at">y =</span> <span class="st">"Lobster Counts"</span>, <span class="at">title =</span> <span class="st">"Lobster Counts Distribution by Year"</span>) <span class="sc">+</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_segment</span>(<span class="at">data =</span> medians, </span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.numeric</span>(<span class="fu">factor</span>(year)) <span class="sc">-</span> <span class="fl">0.3</span>, <span class="at">xend =</span> <span class="fu">as.numeric</span>(<span class="fu">factor</span>(year)) <span class="sc">+</span> <span class="fl">0.3</span>, <span class="at">y =</span> median, <span class="at">yend =</span> median, <span class="at">color =</span> <span class="st">"Median Count"</span>), </span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">linewidth =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"Median Count"</span> <span class="ot">=</span> <span class="st">"red"</span>)) <span class="sc">+</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_classic</span>() <span class="sc">+</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"inside"</span>, <span class="at">legend.position.inside =</span> <span class="fu">c</span>(<span class="fl">0.2</span>, <span class="fl">0.5</span>), <span class="at">legend.title =</span> <span class="fu">element_blank</span>(), <span class="at">legend.text =</span> <span class="fu">element_text</span>(<span class="at">size=</span> <span class="dv">10</span>), <span class="at">legend.background =</span> <span class="fu">element_rect</span>(<span class="at">color =</span> <span class="st">'gray'</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -332,7 +344,7 @@ window.Quarto = {
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_histogram</span>(<span class="at">alpha =</span> <span class="fl">0.4</span>, <span class="at">position =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"MPA"</span> <span class="ot">=</span> <span class="st">"darkgreen"</span>, <span class="st">"non_MPA"</span> <span class="ot">=</span> <span class="st">"grey59"</span>)) <span class="sc">+</span></span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Mean Lobster Size (mm)"</span>, <span class="at">y =</span> <span class="st">"Count"</span>, <span class="at">fill =</span> <span class="st">"MPA Status"</span>) <span class="sc">+</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Mean Lobster Size (mm)"</span>, <span class="at">y =</span> <span class="st">"Count"</span>, <span class="at">fill =</span> <span class="st">"MPA Status"</span>, <span class="at">title =</span> <span class="st">"Mean Lobster Size Distribution by MPA Status"</span>) <span class="sc">+</span></span>
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_classic</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
@@ -350,23 +362,23 @@ window.Quarto = {
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tbl_summary</span>(<span class="at">by =</span> mpa, <span class="at">include =</span> <span class="fu">c</span>(counts, mean_size_mm),</span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">statistic =</span> <span class="fu">list</span>(<span class="fu">all_continuous</span>() <span class="sc">~</span> <span class="st">"{mean} ({sd})"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="dbdsspzhcv" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#dbdsspzhcv table {
+<div id="orppdixxmq" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#orppdixxmq table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#dbdsspzhcv thead, #dbdsspzhcv tbody, #dbdsspzhcv tfoot, #dbdsspzhcv tr, #dbdsspzhcv td, #dbdsspzhcv th {
+#orppdixxmq thead, #orppdixxmq tbody, #orppdixxmq tfoot, #orppdixxmq tr, #orppdixxmq td, #orppdixxmq th {
   border-style: none;
 }
 
-#dbdsspzhcv p {
+#orppdixxmq p {
   margin: 0;
   padding: 0;
 }
 
-#dbdsspzhcv .gt_table {
+#orppdixxmq .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -392,12 +404,12 @@ window.Quarto = {
   border-left-color: #D3D3D3;
 }
 
-#dbdsspzhcv .gt_caption {
+#orppdixxmq .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#dbdsspzhcv .gt_title {
+#orppdixxmq .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -409,7 +421,7 @@ window.Quarto = {
   border-bottom-width: 0;
 }
 
-#dbdsspzhcv .gt_subtitle {
+#orppdixxmq .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -421,7 +433,7 @@ window.Quarto = {
   border-top-width: 0;
 }
 
-#dbdsspzhcv .gt_heading {
+#orppdixxmq .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -433,13 +445,13 @@ window.Quarto = {
   border-right-color: #D3D3D3;
 }
 
-#dbdsspzhcv .gt_bottom_border {
+#orppdixxmq .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#dbdsspzhcv .gt_col_headings {
+#orppdixxmq .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -454,7 +466,7 @@ window.Quarto = {
   border-right-color: #D3D3D3;
 }
 
-#dbdsspzhcv .gt_col_heading {
+#orppdixxmq .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -474,7 +486,7 @@ window.Quarto = {
   overflow-x: hidden;
 }
 
-#dbdsspzhcv .gt_column_spanner_outer {
+#orppdixxmq .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -486,15 +498,15 @@ window.Quarto = {
   padding-right: 4px;
 }
 
-#dbdsspzhcv .gt_column_spanner_outer:first-child {
+#orppdixxmq .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#dbdsspzhcv .gt_column_spanner_outer:last-child {
+#orppdixxmq .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#dbdsspzhcv .gt_column_spanner {
+#orppdixxmq .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -506,11 +518,11 @@ window.Quarto = {
   width: 100%;
 }
 
-#dbdsspzhcv .gt_spanner_row {
+#orppdixxmq .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#dbdsspzhcv .gt_group_heading {
+#orppdixxmq .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -536,7 +548,7 @@ window.Quarto = {
   text-align: left;
 }
 
-#dbdsspzhcv .gt_empty_group_heading {
+#orppdixxmq .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -551,15 +563,15 @@ window.Quarto = {
   vertical-align: middle;
 }
 
-#dbdsspzhcv .gt_from_md > :first-child {
+#orppdixxmq .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#dbdsspzhcv .gt_from_md > :last-child {
+#orppdixxmq .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#dbdsspzhcv .gt_row {
+#orppdixxmq .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -578,7 +590,7 @@ window.Quarto = {
   overflow-x: hidden;
 }
 
-#dbdsspzhcv .gt_stub {
+#orppdixxmq .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -591,7 +603,7 @@ window.Quarto = {
   padding-right: 5px;
 }
 
-#dbdsspzhcv .gt_stub_row_group {
+#orppdixxmq .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -605,15 +617,15 @@ window.Quarto = {
   vertical-align: top;
 }
 
-#dbdsspzhcv .gt_row_group_first td {
+#orppdixxmq .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#dbdsspzhcv .gt_row_group_first th {
+#orppdixxmq .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#dbdsspzhcv .gt_summary_row {
+#orppdixxmq .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -623,16 +635,16 @@ window.Quarto = {
   padding-right: 5px;
 }
 
-#dbdsspzhcv .gt_first_summary_row {
+#orppdixxmq .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#dbdsspzhcv .gt_first_summary_row.thick {
+#orppdixxmq .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#dbdsspzhcv .gt_last_summary_row {
+#orppdixxmq .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -642,7 +654,7 @@ window.Quarto = {
   border-bottom-color: #D3D3D3;
 }
 
-#dbdsspzhcv .gt_grand_summary_row {
+#orppdixxmq .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -652,7 +664,7 @@ window.Quarto = {
   padding-right: 5px;
 }
 
-#dbdsspzhcv .gt_first_grand_summary_row {
+#orppdixxmq .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -662,7 +674,7 @@ window.Quarto = {
   border-top-color: #D3D3D3;
 }
 
-#dbdsspzhcv .gt_last_grand_summary_row_top {
+#orppdixxmq .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -672,11 +684,11 @@ window.Quarto = {
   border-bottom-color: #D3D3D3;
 }
 
-#dbdsspzhcv .gt_striped {
+#orppdixxmq .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#dbdsspzhcv .gt_table_body {
+#orppdixxmq .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -685,7 +697,7 @@ window.Quarto = {
   border-bottom-color: #D3D3D3;
 }
 
-#dbdsspzhcv .gt_footnotes {
+#orppdixxmq .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -699,7 +711,7 @@ window.Quarto = {
   border-right-color: #D3D3D3;
 }
 
-#dbdsspzhcv .gt_footnote {
+#orppdixxmq .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -708,7 +720,7 @@ window.Quarto = {
   padding-right: 5px;
 }
 
-#dbdsspzhcv .gt_sourcenotes {
+#orppdixxmq .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -722,7 +734,7 @@ window.Quarto = {
   border-right-color: #D3D3D3;
 }
 
-#dbdsspzhcv .gt_sourcenote {
+#orppdixxmq .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -730,72 +742,72 @@ window.Quarto = {
   padding-right: 5px;
 }
 
-#dbdsspzhcv .gt_left {
+#orppdixxmq .gt_left {
   text-align: left;
 }
 
-#dbdsspzhcv .gt_center {
+#orppdixxmq .gt_center {
   text-align: center;
 }
 
-#dbdsspzhcv .gt_right {
+#orppdixxmq .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#dbdsspzhcv .gt_font_normal {
+#orppdixxmq .gt_font_normal {
   font-weight: normal;
 }
 
-#dbdsspzhcv .gt_font_bold {
+#orppdixxmq .gt_font_bold {
   font-weight: bold;
 }
 
-#dbdsspzhcv .gt_font_italic {
+#orppdixxmq .gt_font_italic {
   font-style: italic;
 }
 
-#dbdsspzhcv .gt_super {
+#orppdixxmq .gt_super {
   font-size: 65%;
 }
 
-#dbdsspzhcv .gt_footnote_marks {
+#orppdixxmq .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#dbdsspzhcv .gt_asterisk {
+#orppdixxmq .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#dbdsspzhcv .gt_indent_1 {
+#orppdixxmq .gt_indent_1 {
   text-indent: 5px;
 }
 
-#dbdsspzhcv .gt_indent_2 {
+#orppdixxmq .gt_indent_2 {
   text-indent: 10px;
 }
 
-#dbdsspzhcv .gt_indent_3 {
+#orppdixxmq .gt_indent_3 {
   text-indent: 15px;
 }
 
-#dbdsspzhcv .gt_indent_4 {
+#orppdixxmq .gt_indent_4 {
   text-indent: 20px;
 }
 
-#dbdsspzhcv .gt_indent_5 {
+#orppdixxmq .gt_indent_5 {
   text-indent: 25px;
 }
 
-#dbdsspzhcv .katex-display {
+#orppdixxmq .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#dbdsspzhcv div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#orppdixxmq div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -809,27 +821,27 @@ window.Quarto = {
 <thead>
 <tr class="gt_col_headings header">
 <th id="label" class="gt_col_heading gt_columns_bottom_border gt_left" data-quarto-table-cell-role="th" scope="col"><strong>Characteristic</strong></th>
-<th id="stat_1" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>non_MPA</strong><br>
-N = 133<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
-<th id="stat_2" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>MPA</strong><br>
+<th id="stat_1" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>MPA</strong><br>
 N = 119<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
+<th id="stat_2" class="gt_col_heading gt_columns_bottom_border gt_center" data-quarto-table-cell-role="th" scope="col"><strong>non_MPA</strong><br>
+N = 133<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
 </tr>
 </thead>
 <tbody class="gt_table_body">
 <tr class="odd">
 <td class="gt_row gt_left" headers="label">counts</td>
-<td class="gt_row gt_center" headers="stat_1">23 (39)</td>
-<td class="gt_row gt_center" headers="stat_2">28 (44)</td>
+<td class="gt_row gt_center" headers="stat_1">28 (44)</td>
+<td class="gt_row gt_center" headers="stat_2">23 (39)</td>
 </tr>
 <tr class="even">
 <td class="gt_row gt_left" headers="label">mean_size_mm</td>
-<td class="gt_row gt_center" headers="stat_1">73 (7)</td>
-<td class="gt_row gt_center" headers="stat_2">76 (7)</td>
+<td class="gt_row gt_center" headers="stat_1">76 (7)</td>
+<td class="gt_row gt_center" headers="stat_2">73 (7)</td>
 </tr>
 <tr class="odd">
 <td class="gt_row gt_left" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Unknown</td>
-<td class="gt_row gt_center" headers="stat_1">15</td>
-<td class="gt_row gt_center" headers="stat_2">12</td>
+<td class="gt_row gt_center" headers="stat_1">12</td>
+<td class="gt_row gt_center" headers="stat_2">15</td>
 </tr>
 </tbody><tfoot>
 <tr class="gt_footnotes odd">
@@ -1284,7 +1296,7 @@ N = 119<span class="gt_footnote_marks" style="white-space:nowrap;font-style:ital
 <p><strong>c.</strong> Take a look at the regression output. Each coefficient provides a comparison or the difference in means for a specific sub-group in the data. Informally, describe the what the model has estimated at a conceptual level (NOTE: you do not have to interpret coefficients individually)</p>
 <p>This model also uses a log link like the Poisson, so each coefficient represents multiplicative effects of lobster counts. In this model we also included another predictor, year, which the coefficients represent how counts changed over time. We also have interaction terms between treat and year. This is the additional treatment effect that changes across each year, without it we’d be assuming that the treatment effect would be constant every year.</p>
 <p><strong>d.</strong> Explain why the main effect for treatment is negative? *Does this result make sense?</p>
-<p>The treatment coefficient represents how treatment changes our counts in 2012, the negative value indicates that treatment sites had lower counts initially. Interpreting the treatment coefficient in the non-link, treatment sites had a 82% reduction in counts. However, this changes over time past 2012 and treatment counts increased indicated by the positive interaction coefficients.</p>
+<p>The treatment coefficient represents how treatment changes our counts in 2012, the negative value indicates that treatment sites had lower counts initially. Interpreting the treatment coefficient in the non-link, treatment sites had a 82% reduction in counts. However, this changes over time past 2012 and treatment counts increased indicated by the positive interaction coefficients. This trend from a negative treatment coefficient to a positive takes time (around 2014) indicating MPAs take time to see a difference in lobster counts.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>ff_counts <span class="ot">&lt;-</span> spiny_counts <span class="sc">%&gt;%</span> </span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">year=</span><span class="fu">as_factor</span>(year))</span>

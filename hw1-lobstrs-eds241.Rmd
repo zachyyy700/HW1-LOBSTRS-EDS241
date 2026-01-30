@@ -137,7 +137,8 @@ spiny_counts <- spiny_counts |>
         treat = case_when(
             mpa == "MPA" ~ 1,
             mpa == "non_MPA" ~ 0
-        ))
+        )) |> 
+    mutate(mpa = factor(mpa, levels = c("MPA", "non_MPA")))
 
 ```
 
@@ -169,21 +170,23 @@ Create a plot of lobster **size** :
 4)  You choose the grouping variable(s)!
 
 ```{r}
+site_order <- c("NAPL", "IVEE", "MOHK", "CARP", "AQUE")
 # Plot1: Lobster counts by site
-ggplot(spiny_counts, aes(x = counts, y = site, fill = mpa)) +
+ggplot(spiny_counts, aes(x = counts, y = factor(site, levels = site_order), fill = mpa)) +
     geom_violin(quantile.linetype = "solid") +
     scale_fill_manual(values = c("MPA" = "darkgreen", "non_MPA" = "grey59")) +
-    labs(x = "Lobster Count", y = "Site", fill = "MPA Status") +
+    labs(x = "Lobster Count", y = "Site", fill = "MPA Status", title = "Lobster Count Distribution per Site") +
+    scale_y_discrete(limits = rev) +
     theme_classic()
 ```
 
 ```{r}
 # Plot2: Lobster counts by mpa
-spiny_counts <- spiny_counts |> 
-    mutate(mpa = factor(mpa, levels = c("non_MPA", "MPA")))
+
 means <- spiny_counts |> 
     group_by(mpa) |> 
     summarise(mean = mean(counts, na.rm = TRUE))
+
 ggplot(spiny_counts, aes(x = counts, y = mpa)) +
     geom_density_ridges2(scale = 2) +
 
@@ -193,20 +196,29 @@ ggplot(spiny_counts, aes(x = counts, y = mpa)) +
     y = as.numeric(mpa), yend = as.numeric(mpa) + 1), color = "red", 
     linewidth = 1, linetype = "dashed") +
 
-    labs(x = "Lobster Count", y = "MPA Status") +
+    labs(x = "Lobster Count", y = "MPA Status", title = "Lobster Count Distribution by MPA Status") +
 
     theme_classic() +
-    theme(legend.position = "none")
+    theme(legend.position = "none", axis.title.y = element_blank())
 ```
 
 ```{r}
-# Plot3: Lobster count density by year
-ggplot(spiny_counts, aes(x = counts, group = factor(year), color = factor(year))) +
-    geom_density() +
+# Plot3: Lobster count jitter by year
+medians <- spiny_counts |> 
+    group_by(year) |> 
+    summarise(median = median(counts, na.rm = TRUE))
 
-    labs(x = "Lobster Counts", y = "Density", color = "Year") +
+ggplot(spiny_counts, aes(x = factor(year), y = counts)) +
+    geom_jitter(width = 0.2) +
+    labs(x = "Year", y = "Lobster Counts", title = "Lobster Counts Distribution by Year") +
 
-    theme_classic()
+    geom_segment(data = medians, 
+    aes(x = as.numeric(factor(year)) - 0.3, xend = as.numeric(factor(year)) + 0.3, y = median, yend = median, color = "Median Count"), 
+    linewidth = 1.5) +
+
+    scale_color_manual(values = c("Median Count" = "red")) +
+    theme_classic() +
+    theme(legend.position = "inside", legend.position.inside = c(0.2, 0.5), legend.title = element_blank(), legend.text = element_text(size= 10), legend.background = element_rect(color = 'gray'))
 ```
 
 ```{r}
@@ -215,7 +227,7 @@ ggplot(spiny_counts, aes(x = mean_size_mm, fill = mpa)) +
     geom_histogram(alpha = 0.4, position = "identity") +
     scale_fill_manual(values = c("MPA" = "darkgreen", "non_MPA" = "grey59")) +
 
-    labs(x = "Mean Lobster Size (mm)", y = "Count", fill = "MPA Status") +
+    labs(x = "Mean Lobster Size (mm)", y = "Count", fill = "MPA Status", title = "Mean Lobster Size Distribution by MPA Status") +
 
     theme_classic()
 ```
@@ -405,7 +417,7 @@ This model also uses a log link like the Poisson, so each coefficient represents
 
 **d.** Explain why the main effect for treatment is negative? \*Does this result make sense?
 
-The treatment coefficient represents how treatment changes our counts in 2012, the negative value indicates that treatment sites had lower counts initially. Interpreting the treatment coefficient in the non-link, treatment sites had a 82% reduction in counts. However, this changes over time past 2012 and treatment counts increased indicated by the positive interaction coefficients.
+The treatment coefficient represents how treatment changes our counts in 2012, the negative value indicates that treatment sites had lower counts initially. Interpreting the treatment coefficient in the non-link, treatment sites had a 82% reduction in counts. However, this changes over time past 2012 and treatment counts increased indicated by the positive interaction coefficients. This trend from a negative treatment coefficient to a positive takes time (around 2014) indicating MPAs take time to see a difference in lobster counts.
 
 ```{r}
 
